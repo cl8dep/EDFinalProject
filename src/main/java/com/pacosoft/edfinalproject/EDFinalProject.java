@@ -53,6 +53,9 @@ public class EDFinalProject {
 
             tree.addNewEquipment(child2_1, child2);
 
+            System.out.println(tree.ObtenerMejorSet());
+            System.out.println(tree.ObtenerSetBalanceado());
+            
             // System.out.println(tree.branchAverage(child2_1, null));
         } catch (Exception e) {
             e.printStackTrace();

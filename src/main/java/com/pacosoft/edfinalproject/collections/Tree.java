@@ -1,13 +1,15 @@
 package com.pacosoft.edfinalproject.collections;
 
+import java.util.ArrayList;
+
 public class Tree<T> {
 
     protected T root;
     protected Tree<T> parent;
-    private LinkedList<Tree<T>> children;
+    private ArrayList<Tree<T>> children;
 
     public Tree() {
-        children = new LinkedList<>();
+        children = new ArrayList<>();
     }
 
     public Tree(T root) {
@@ -69,7 +71,7 @@ public class Tree<T> {
         return nodeTemp.parent;
     }
 
-    public LinkedList<Tree<T>> getChildren() {
+    public ArrayList<Tree<T>> getChildren() {
         return children;
     }
 

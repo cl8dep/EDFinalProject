@@ -1,6 +1,5 @@
 package com.pacosoft.edfinalproject;
 
-import com.pacosoft.edfinalproject.collections.LinkedList;
 import com.pacosoft.edfinalproject.collections.Queue;
 import com.pacosoft.edfinalproject.collections.Stack;
 import com.pacosoft.edfinalproject.collections.Tree;
@@ -9,6 +8,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class EquipmentTree extends Tree<Equipment> {
 
@@ -113,7 +115,7 @@ public class EquipmentTree extends Tree<Equipment> {
             level = 1;
         }*/
         for (var subTree : tree.getChildren()) {
-            result += branchMaxAverage((EquipmentTree)subTree, map, key, level + 1);
+            result += branchMaxAverage((EquipmentTree) subTree, map, key, level + 1);
             key++;
         }
 
@@ -130,6 +132,86 @@ public class EquipmentTree extends Tree<Equipment> {
         } while (cursor != null);
 
         return sum / counter;
+    }
+
+    public List<Equipment> ObtenerMejorSet() {
+        // lista para guardar los valores de los de la rama
+        ArrayList<Equipment> rama = new ArrayList<>();
+        HashMap<String, ArrayList<Equipment>> resultado = new HashMap<>();
+        // agregar el valor de la raiz
+        rama.add(root);
+
+        recorrerRamas(this, rama, resultado);
+
+        String mayor = null;
+        float mayor_valor = 0;
+        Set<String> keys = resultado.keySet();
+        for (String key : keys) {
+            float prom = 0;
+            for (Equipment e : resultado.get(key)) {
+                prom += e.getPoints();
+            }
+            prom /= resultado.get(key).size();
+            if (prom > mayor_valor) {
+                mayor = key;
+                mayor_valor = prom;
+            }
+        }
+        return resultado.get(mayor);
+    }
+
+    public List<Equipment> ObtenerSetBalanceado() {
+        ArrayList<Equipment> rama = new ArrayList<>();
+        HashMap<String, ArrayList<Equipment>> resultado = new HashMap<>();
+        // agregar el valor de la raiz
+        rama.add(root);
+
+        recorrerRamas(this, rama, resultado);
+
+        String mayor = null;
+        float mayor_valor = 0;
+        Set<String> keys = resultado.keySet();
+        float prom_general = 0;
+        int cant = 0;
+        for (String key : keys) {
+            for (Equipment e : resultado.get(key)) {
+                prom_general += e.getPoints();
+                cant++;
+            }
+        }
+        prom_general /= cant;
+
+        for (String key : keys) {
+            float prom = 0;
+            for (Equipment e : resultado.get(key)) {
+                prom += e.getPoints();
+            }
+            prom /= resultado.get(key).size();
+            float ratio = prom < prom_general ? prom / prom_general : prom_general / prom;
+            if (ratio > mayor_valor) {
+                mayor = key;
+                mayor_valor = ratio;
+            }
+        }
+
+        return resultado.get(mayor);
+    }
+
+    public void recorrerRamas(Tree<Equipment> nodo, ArrayList<Equipment> rama, HashMap<String, ArrayList<Equipment>> resultado) {
+        // si el nodo no tiene hijos imprimir la colección de valores
+        if (nodo.isLeaf()) {
+            resultado.put(rama.get(rama.size() - 1).getName(), (ArrayList<Equipment>) rama.clone());
+        }
+        // recorrer los hijos del nodo
+        for (Tree<Equipment> child : nodo.getChildren()) {
+            // agregar el valor  del nodo a la lista
+            rama.add(child.getRoot());
+            // llamada recursiva
+            recorrerRamas(child, rama, resultado);
+            // retirar el ultimo valor insertado
+            rama.remove(rama.size() - 1);
+        }
+
     }
 
 }
